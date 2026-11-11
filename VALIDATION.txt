@@ -15,11 +15,17 @@ Public resource bundle:
 - Tela aliases are restored from a pinned upstream commit, with relative-link and
   relocation checks after building. Source snapshots are not edited in place.
 
-Automated checks (34 tests passed):
+Arch / GNOME 51 checks:
+- Dependency preview and full Orchis/Tela/Breeze build passed without GTK2 engines.
+- Compiled the native Shell 51 style and validated generated resource links.
+- No desktop settings were changed during this build check.
+
+Automated checks (37 tests passed):
 - Backup/restore, partial restore, rollback, settings preservation and source validation.
 - GNOME 48/51 Sass compilation and matching User Themes selection.
 - Real Tela build, relocation, icon cache validation, repaired aliases and scaled paths.
 - Setup dependency planning and streamed installer dispatch/archive validation.
+- Arch skips legacy GTK2/AUR packages; failed setup exits without a wrapper traceback.
 - Tests use temporary directories and simulated settings/package installation.
 
 Limits:

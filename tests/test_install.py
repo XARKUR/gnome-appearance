@@ -44,6 +44,18 @@ class SetupTests(unittest.TestCase):
              patch.object(install, 'package_installed', side_effect=AssertionError('irrelevant package query')):
             self.assertEqual(install.dependency_plan(app), ('apt', []))
 
+    def test_arch_without_legacy_gtk2_packages_needs_no_optional_installs(self):
+        with patch.object(install, 'distribution', return_value={'arch'}), \
+             patch.object(install.shutil, 'which', return_value='/bin/tool'), \
+             patch.object(install, 'package_installed', side_effect=AssertionError('legacy package query')):
+            self.assertEqual(install.dependency_plan(self.app()), ('pacman', []))
+
+    def test_arch_missing_build_tool_does_not_pull_in_aur_packages(self):
+        with patch.object(install, 'distribution', return_value={'arch'}), \
+             patch.object(install.shutil, 'which', side_effect=lambda c: None if c == 'sassc' else '/bin/tool'), \
+             patch.object(install, 'package_installed', return_value=False):
+            self.assertEqual(install.dependency_plan(self.app()), ('pacman', ['sassc']))
+
     def test_unknown_distribution_with_missing_tools_stops(self):
         with patch.object(install, 'distribution', return_value={'other'}), \
              patch.object(install.shutil, 'which', return_value=None):
@@ -76,9 +88,9 @@ class SetupTests(unittest.TestCase):
              patch.dict(install.os.environ, {'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/fixture/bus'}), \
              patch.object(install, 'dependency_plan', return_value=('apt', ['sassc'])), \
              patch.object(install.shutil, 'which', return_value='/bin/sudo'), \
-             patch.object(install.subprocess, 'run', side_effect=install.subprocess.CalledProcessError(1, ['apt-get'])), \
+             patch.object(install.subprocess, 'run', return_value=install.subprocess.CompletedProcess(['apt-get'], 1)), \
              contextlib.redirect_stdout(io.StringIO()):
-            with self.assertRaises(install.subprocess.CalledProcessError):
+            with self.assertRaisesRegex(RuntimeError, '尚未应用外观'):
                 install.setup(app)
         app.apply.assert_not_called()
 

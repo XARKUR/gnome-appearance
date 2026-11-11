@@ -11,10 +11,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BootstrapTests(unittest.TestCase):
-    def run_fixture(self, member_name):
+    def run_fixture(self, member_name, exit_code=0):
         with tempfile.TemporaryDirectory(prefix='bootstrap-test-') as temp:
             root = Path(temp)
             payload = b'import os, pathlib, sys; pathlib.Path(os.environ["BOOTSTRAP_OUTPUT"]).write_text(" ".join(sys.argv[1:]))'
+            payload += ('; sys.exit(' + str(exit_code) + ')').encode()
             stream = io.BytesIO()
             with tarfile.open(fileobj=stream, mode='w:gz') as archive:
                 info = tarfile.TarInfo(member_name)
@@ -42,6 +43,12 @@ class BootstrapTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(b'Unsupported path', result.stderr)
         self.assertIsNone(output)
+
+    def test_failed_setup_preserves_exit_code_without_wrapper_traceback(self):
+        result, output = self.run_fixture('project-main/appearance.py', exit_code=2)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(output, 'setup --fixture')
+        self.assertNotIn(b'Traceback', result.stderr)
 
 
 if __name__ == '__main__':

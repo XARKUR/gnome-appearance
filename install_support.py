@@ -39,8 +39,11 @@ def dependency_plan(app):
         if command not in mapping[manager]:
             raise RuntimeError('请先安装并登录 GNOME 桌面；缺少命令：' + command)
         packages.add(mapping[manager][command])
-    if 'theme' in app.selected and app.profile['theme']['adapter'] == 'orchis':
-        optional = ['gtk2-engines-murrine', 'gnome-themes-extra'] if manager == 'apt' else ['gtk-engine-murrine', 'gnome-themes-extra']
+    # Arch's legacy GTK2 engines live outside the official repositories. They
+    # are not required to build or use the GTK3/GTK4/Shell themes; never pass
+    # AUR package names to pacman or install an AUR helper automatically.
+    if manager == 'apt' and 'theme' in app.selected and app.profile['theme']['adapter'] == 'orchis':
+        optional = ['gtk2-engines-murrine', 'gnome-themes-extra']
         packages.update(name for name in optional if not package_installed(manager, name))
     return manager, sorted(packages)
 
@@ -76,6 +79,9 @@ def setup(app, skip_deps=False, dry_run=False):
             raise RuntimeError('需要管理员安装这些依赖：' + ', '.join(packages))
         print('安装缺少的依赖：' + ', '.join(packages), flush=True)
         # sudo reads the controlling terminal; passwords are never read here.
-        subprocess.run(package_command(manager, packages), check=True)
+        result = subprocess.run(package_command(manager, packages))
+        if result.returncode:
+            raise RuntimeError('依赖安装失败（退出码 ' + str(result.returncode)
+                               + '），尚未应用外观。请处理上方软件包管理器提示后重新运行。')
     app.apply()
     print('安装完成。首次安装 User Themes 后请注销并重新登录；已有应用可重新打开。')

@@ -61,5 +61,6 @@ with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as source:
 projects = list(root.glob('*/appearance.py'))
 if len(projects) != 1:
     raise SystemExit('Invalid source archive layout.')
-subprocess.run([sys.executable, str(projects[0]), sys.argv[2], *sys.argv[3:]], check=True)
+result = subprocess.run([sys.executable, str(projects[0]), sys.argv[2], *sys.argv[3:]])
+sys.exit(result.returncode)
 PYINSTALL

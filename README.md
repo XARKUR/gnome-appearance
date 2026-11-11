@@ -68,7 +68,9 @@ GNOME 51 样式使用固定的原生 51.1 控件规则，接入 Orchis 的色板
 | 发行版 | 常用生成依赖 |
 | --- | --- |
 | Debian / Ubuntu | `sassc libgtk-3-bin libglib2.0-bin gtk2-engines-murrine gnome-themes-extra` |
-| Arch | `sassc gtk3 glib2 gtk-engine-murrine gnome-themes-extra` |
+| Arch | `sassc gtk3 glib2` |
+
+Arch 的 `gtk-engine-murrine` 已移至 AUR，仅用于旧 GTK2 应用的主题引擎，不影响 GTK3、GTK4 或 Shell 样式。安装器不会把它交给 `pacman`，也不会自动安装 AUR 助手；需要旧应用换肤时可自行处理这些可选依赖。
 
 其他发行版请自行安装相应工具后使用 `--skip-deps`。系统已有依赖时不重新安装；Arch 不执行单独刷新包数据库或全系统升级。若软件包索引过期，请先按发行版方式维护软件源。
 
