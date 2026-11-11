@@ -1,0 +1,10 @@
+/build/
+/reports/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+*.local.json
+/backups/
+/tools/

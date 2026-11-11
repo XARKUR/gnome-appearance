@@ -1,0 +1,13 @@
+{
+  "upstream": "https://github.com/GNOME/gnome-shell",
+  "tag": "51.1",
+  "source_url": "https://codeload.github.com/GNOME/gnome-shell/tar.gz/refs/tags/51.1",
+  "archive_sha256": "69ad239c9026ce649a644af27c2a96df1c941344dd0ef23fc4710df7f3673a0e",
+  "orchis_upstream_head_reviewed": "a4c48a425e63808345e824495964bd9c2f462e04",
+  "orchis_source": "Bundled Orchis-theme-2026-07-07 snapshot",
+  "changes": [
+    "Orchis palette and geometry mapped onto GNOME 51.1 widget rules",
+    "Isolated Sass entry, with local appearance overrides and bundled SVG references"
+  ],
+  "visual_validation": "pending on GNOME Shell 51.1"
+}

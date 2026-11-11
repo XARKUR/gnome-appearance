@@ -1,0 +1,13 @@
+{
+  "project": "KDE Breeze",
+  "version": "5.27.5",
+  "source_url": "https://download.kde.org/stable/plasma/5.27.5/breeze-5.27.5.tar.xz",
+  "source_sha256": "70d8a35bf8c0758f9c3e3873b657250b1e09c1c79f92b066d3385a1e44fec868",
+  "included_source": "breeze-source.tar.xz (cursors and license files; other Breeze components omitted)",
+  "binary_url": "https://deb.debian.org/debian/pool/main/b/breeze/breeze-cursor-theme_5.27.5-2_all.deb",
+  "binary_version": "4:5.27.5-2",
+  "binary_sha256": "a14099155ab9ec02b7d08cf86f52c9295df16889ddcfc1732ebe1130c6e8e803",
+  "installed_directory": "Breeze (upstream breeze_cursors directory, unchanged cursor data)",
+  "license": "LGPL-3.0-or-later artwork; upstream file-level notices retained",
+  "license_reference": "licenses/breeze-debian-copyright.txt"
+}

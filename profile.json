@@ -1,0 +1,28 @@
+{
+  "theme": {
+    "enabled": true,
+    "adapter": "orchis",
+    "source": "Orchis-theme-2026-07-07",
+    "name": "Orchis-Dark",
+    "variant": "default",
+    "color": "dark",
+    "size": "standard",
+    "shell": true,
+    "gtk4": true
+  },
+  "icons": {
+    "enabled": true,
+    "adapter": "tela",
+    "source": "Tela-icon-theme-2026-07-07",
+    "name": "Tela-dark",
+    "base_name": "Tela",
+    "variant": "standard"
+  },
+  "cursor": {
+    "enabled": true,
+    "adapter": "directory",
+    "source": "Breeze",
+    "name": "Breeze",
+    "size": 24
+  }
+}

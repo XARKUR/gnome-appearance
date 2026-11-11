@@ -1,0 +1,27 @@
+GNOME Appearance validation
+
+Desktop checks on Debian 13 / GNOME 48:
+- Orchis-Dark and Tela-dark, including the Tela base dependency, installed successfully.
+- User Themes loaded the Shell stylesheet after a fresh login.
+- 1,271 installed icon names decoded with GTK4; no empty installed SVG files remained.
+- Common application/settings icons passed GTK3/GTK4 loading at scale factors 1, 2 and 3.
+- GTK4 stylesheet parsing and legacy named-color resolution passed.
+
+Public resource bundle:
+- Breeze uses the official Debian 5.27.5 cursor package; matching KDE cursor sources,
+  upstream notices and Debian licensing clarification are included.
+- All 115 official cursor names loaded at sizes 24/48/72 (345 decode checks).
+- Checksums are recorded in resources/manifest.json and resources/breeze.lock.json.
+- Tela aliases are restored from a pinned upstream commit, with relative-link and
+  relocation checks after building. Source snapshots are not edited in place.
+
+Automated checks (34 tests passed):
+- Backup/restore, partial restore, rollback, settings preservation and source validation.
+- GNOME 48/51 Sass compilation and matching User Themes selection.
+- Real Tela build, relocation, icon cache validation, repaired aliases and scaled paths.
+- Setup dependency planning and streamed installer dispatch/archive validation.
+- Tests use temporary directories and simulated settings/package installation.
+
+Limits:
+- Automated loading and parsing do not establish complete visual correctness.
+- GNOME 51.1 full-session visual acceptance is still pending.

@@ -1,0 +1,10 @@
+// Orchis appearance on GNOME Shell 51.1 widget rules.
+// Local integration is GPL-3.0-or-later; upstream notices remain in vendor/.
+// $variant, $topbar and $compact are supplied by the isolated builder.
+@import 'variables'; // From the pinned Orchis source, not the host theme.
+@import 'colors';
+@import 'ported/colors';
+@import 'vendor/gnome-shell-sass/drawing';
+@import 'ported/common';
+@import 'vendor/gnome-shell-sass/widgets';
+@import 'orchis-overrides';
