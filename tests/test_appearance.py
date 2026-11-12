@@ -292,6 +292,7 @@ class AppearanceTests(unittest.TestCase):
                     self.assertIn('assets/activities.svg', (output / 'gnome-shell.css').read_text())
                     if major == 51:
                         self.assertIn('background-size: 24px;', (output / 'gnome-shell.css').read_text())
+                        self.assertNotIn('background-position: center;', (output / 'gnome-shell.css').read_text())
                         self.assertNotIn('background-size: 24px 24px;', (output / 'gnome-shell.css').read_text())
 
     def test_invalid_resource_path_and_name_are_rejected(self):
