@@ -20,9 +20,10 @@ Arch / GNOME 51 checks:
 - Compiled the native Shell 51 style and validated generated resource links.
 - No desktop settings were changed during this build check.
 
-Automated checks (37 tests passed):
+Automated checks (39 tests passed):
 - Backup/restore, partial restore, rollback, settings preservation and source validation.
 - GNOME 48/51 Sass compilation and matching User Themes selection.
+- Both Shell builders select the requested Debian/Arch activities SVG and reference it in CSS.
 - Real Tela build, relocation, icon cache validation, repaired aliases and scaled paths.
 - Setup dependency planning and streamed installer dispatch/archive validation.
 - Arch skips legacy GTK2/AUR packages; failed setup exits without a wrapper traceback.

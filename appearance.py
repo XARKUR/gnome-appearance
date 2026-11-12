@@ -20,6 +20,9 @@ import zipfile
 ROOT = Path(__file__).resolve().parent
 USER_THEME = 'user-theme@gnome-shell-extensions.gcampax.github.com'
 PARTS = ('theme', 'icons', 'cursor')
+ACTIVITIES_ICONS = ('auto', 'default', 'apple', 'simple', 'gnome', 'ubuntu', 'arch',
+                    'manjaro', 'fedora', 'debian', 'void', 'opensuse', 'popos', 'mxlinux',
+                    'zorin', 'endeavouros', 'tux', 'nixos', 'gentoo', 'budgie', 'solus', 'kali')
 
 
 class Error(RuntimeError):
@@ -374,6 +377,8 @@ def load_profile(path):
             raise Error('Orchis 配色无效')
         if theme.get('color') not in ('standard', 'light', 'dark') or theme.get('size') not in ('standard', 'compact'):
             raise Error('Orchis 明暗或尺寸无效')
+        if 'activities_icon' in theme and theme['activities_icon'] not in ACTIVITIES_ICONS:
+            raise Error('Orchis 活动按钮图标无效')
     if data['icons']['adapter'] == 'tela':
         safe_name(data['icons']['base_name'])
         if data['icons'].get('variant') not in ('standard', 'black', 'blue', 'brown', 'green', 'grey', 'orange', 'pink',
@@ -393,6 +398,15 @@ def version_major(value):
     return int(str(value).split('.')[0])
 
 
+def activities_icon(theme):
+    icon = theme.get('activities_icon')
+    if icon != 'auto':
+        return icon
+    release = dict(line.split('=', 1) for line in Path('/etc/os-release').read_text().splitlines() if '=' in line)
+    distro = release.get('ID', '').strip('"\'')
+    return distro if distro in ('debian', 'arch') else 'default'
+
+
 def build_shell48(orchis, output, theme):
     """Compile the existing Orchis 48 stylesheet without running install.sh."""
     if not shutil.which('sassc'):
@@ -404,6 +418,9 @@ def build_shell48(orchis, output, theme):
         tweaks = (source / '_sass/_tweaks.scss').read_text()
         tweaks = tweaks.replace("$theme: 'default';", "$theme: '" + theme['variant'] + "';")
         tweaks = tweaks.replace("$gnome_version: 'old';", "$gnome_version: 'new';")
+        icon = activities_icon(theme)
+        if icon:
+            tweaks = tweaks.replace("$activities: 'normal';", "$activities: 'icon';")
         if theme['variant'] != 'default':
             tweaks = tweaks.replace("$accent_type: 'default';", "$accent_type: 'fixed';")
         (source / '_sass/_tweaks-temp.scss').write_text(tweaks)
@@ -420,7 +437,7 @@ def build_shell48(orchis, output, theme):
         palette = shell / ('theme' + ('-' + theme['variant'].title() if theme['variant'] != 'default' else ''))
         for name in ['more-results', 'toggle-on']:
             shutil.copy2(palette / (name + dark + '.svg'), result / 'assets' / (name + '.svg'))
-        copy(shell / 'activities/activities-default.svg', result / 'assets/activities.svg')
+        copy(shell / ('activities/activities-' + (icon or 'default') + '.svg'), result / 'assets/activities.svg')
         copy(shell / 'pad-osd.css', result / 'pad-osd.css')
         copy(orchis / 'COPYING', result / 'COPYING-Orchis')
         for name in ['no-events.svg', 'process-working.svg', 'no-notifications.svg']:
@@ -444,6 +461,9 @@ def build_shell51(orchis, output, theme):
         # Build from the profile, independent of leftovers in an external source tree.
         tweaks = (source / '_tweaks.scss').read_text()
         tweaks = tweaks.replace("$theme: 'default';", "$theme: '" + theme['variant'] + "';")
+        icon = activities_icon(theme)
+        if icon:
+            tweaks = tweaks.replace("$activities: 'normal';", "$activities: 'icon';")
         (source / '_tweaks-temp.scss').write_text(tweaks)
         port = work / 'port'
         copy(ROOT / 'resources/shell-51', port)
@@ -468,6 +488,8 @@ def build_shell51(orchis, output, theme):
         assets.mkdir()
         for svg in (port / 'vendor').glob('*.svg'):
             copy(svg, assets / svg.name)
+        if icon:
+            copy(orchis / ('src/gnome-shell/activities/activities-' + icon + '.svg'), assets / 'activities.svg')
         copy(port / 'vendor/pad-osd.css', result / 'pad-osd.css')
         copy(port / 'vendor/COPYING', result / 'COPYING-GNOME')
         copy(ROOT / 'resources/licenses/LGPL-2.1.txt', result / 'COPYING-LGPL-2.1')
@@ -492,8 +514,12 @@ def build_commands(profile, selected, source, output):
     if 'theme' in selected and theme['adapter'] == 'orchis':
         # Let upstream detect the actual Shell version. Its explicit --shell flag
         # omits another GNOME flag required by recent accent styles.
-        result.append((bounded(source, theme['source']), ['bash', 'install.sh', '-d', str(output / 'themes'),
-            '-t', theme['variant'], '-c', theme['color'], '-s', theme['size']]))
+        argv = ['bash', 'install.sh', '-d', str(output / 'themes'),
+                '-t', theme['variant'], '-c', theme['color'], '-s', theme['size']]
+        icon = activities_icon(theme)
+        if icon:
+            argv += ['-i', icon]
+        result.append((bounded(source, theme['source']), argv))
     if 'icons' in selected and icons['adapter'] == 'tela':
         result.append((bounded(source, icons['source']), ['bash', 'install.sh', '-d', str(output / 'icons'), icons['variant']]))
     return result
@@ -599,6 +625,8 @@ class Appearance:
             action = {'part': part, 'adapter': c['adapter'], 'name': c['name']}
             if part == 'theme':
                 action.update(shell=bool(c.get('shell')), gtk4=bool(c.get('gtk4')), destination=str(self.home / '.themes' / c['name']))
+                if c['adapter'] == 'orchis':
+                    action['activities_icon'] = activities_icon(c)
                 if c.get('shell'):
                     try:
                         action['shell_style'] = self.shell_style(major)

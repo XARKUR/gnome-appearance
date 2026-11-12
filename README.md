@@ -33,6 +33,12 @@ curl -fsSL https://raw.githubusercontent.com/XARKUR/gnome-appearance/main/instal
 
 GTK4/libadwaita 全局换肤会影响应用样式；如果某个应用显示异常，可以单独恢复 GTK4。壁纸、字体、文字缩放、快捷键、Dock 和其他扩展的设置不在本项目的修改范围内。
 
+## 活动按钮图标
+
+默认 `profile.json` 中的 `theme.activities_icon` 为 `auto`。安装时读取发行版，Debian 使用 Debian 图标，Arch 使用 Arch 图标，其他发行版使用 Orchis 默认图标。GNOME 48 和 51 的 Shell 输出都包含所选图标。
+
+可以将该字段改为 `debian`、`arch` 或 Orchis 支持的其他图标名称，以固定选择。旧配置未设置该字段时保留原活动按钮样式。此选项对应 Orchis 的 `-i` 参数。
+
 ## 恢复
 
 ```sh

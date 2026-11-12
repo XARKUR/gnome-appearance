@@ -8,7 +8,8 @@
     "color": "dark",
     "size": "standard",
     "shell": true,
-    "gtk4": true
+    "gtk4": true,
+    "activities_icon": "auto"
   },
   "icons": {
     "enabled": true,

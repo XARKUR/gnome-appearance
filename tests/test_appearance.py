@@ -265,9 +265,31 @@ class AppearanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             source, output = Path(d), Path(d) / 'output'
             commands = a.build_commands(self.profile, ['theme', 'icons'], source, output)
-            self.assertEqual(commands[0][1][-6:], ['-t', 'default', '-c', 'dark', '-s', 'standard'])
+            self.assertEqual(commands[0][1][-8:-2], ['-t', 'default', '-c', 'dark', '-s', 'standard'])
+            self.assertEqual(commands[0][1][-2:], ['-i', a.activities_icon(self.profile['theme'])])
             self.assertEqual(commands[1][1][-1], 'standard')
             self.assertFalse(any('-a' in cmd or '--tweaks' in cmd or '-l' in cmd or 'sudo' in cmd for _, cmd in commands))
+
+    def test_activity_icon_auto_and_explicit_selection(self):
+        for distro, expected in [('debian', 'debian'), ('arch', 'arch'), ('ubuntu', 'default')]:
+            with patch.object(Path, 'read_text', return_value='ID="' + distro + '"\n'):
+                self.assertEqual(a.activities_icon({'activities_icon': 'auto'}), expected)
+        self.assertEqual(a.activities_icon({'activities_icon': 'arch'}), 'arch')
+        self.assertIsNone(a.activities_icon({}))  # Existing profiles keep their normal activities button.
+
+    def test_activity_icon_assets_match_both_shell_builders(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            a.extract_tar(ROOT / 'resources/sources.tar.xz', root / 'sources')
+            source = root / 'sources' / self.profile['theme']['source']
+            for major, builder in [(48, a.build_shell48), (51, a.build_shell51)]:
+                for icon in ['debian', 'arch']:
+                    theme = dict(self.profile['theme'], activities_icon=icon)
+                    output = root / (str(major) + '-' + icon)
+                    builder(source, output, theme)
+                    expected = source / ('src/gnome-shell/activities/activities-' + icon + '.svg')
+                    self.assertEqual((output / 'assets/activities.svg').read_bytes(), expected.read_bytes())
+                    self.assertIn('assets/activities.svg', (output / 'gnome-shell.css').read_text())
 
     def test_invalid_resource_path_and_name_are_rejected(self):
         with tempfile.TemporaryDirectory() as d:
