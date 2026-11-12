@@ -290,6 +290,9 @@ class AppearanceTests(unittest.TestCase):
                     expected = source / ('src/gnome-shell/activities/activities-' + icon + '.svg')
                     self.assertEqual((output / 'assets/activities.svg').read_bytes(), expected.read_bytes())
                     self.assertIn('assets/activities.svg', (output / 'gnome-shell.css').read_text())
+                    if major == 51:
+                        self.assertIn('background-size: 24px;', (output / 'gnome-shell.css').read_text())
+                        self.assertNotIn('background-size: 24px 24px;', (output / 'gnome-shell.css').read_text())
 
     def test_invalid_resource_path_and_name_are_rejected(self):
         with tempfile.TemporaryDirectory() as d:
@@ -434,3 +437,33 @@ class AppearanceTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class CursorCompatibilityTests(unittest.TestCase):
+    def test_legacy_lookup_alias_and_original_directory_restore(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);home=root/'home';data=home/'.local/share'
+            target=data/'icons/Breeze';target.mkdir(parents=True)
+            (target/'index.theme').write_text('new cursor theme')
+            legacy=home/'.icons/Breeze';legacy.mkdir(parents=True)
+            (legacy/'index.theme').write_text('original cursor theme')
+            temp=root/'stage';temp.mkdir()
+            journal=a.Journal(root/'state')
+            a.install_cursor_alias(journal,temp,home,data,'Breeze')
+            journal.finish()
+            self.assertTrue(legacy.is_symlink())
+            self.assertEqual(legacy.resolve(),target)
+            journal.restore()
+            self.assertFalse(legacy.is_symlink())
+            self.assertEqual((legacy/'index.theme').read_text(),'original cursor theme')
+
+    def test_existing_legacy_parent_alias_does_not_create_self_link(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);home=root/'home';data=home/'.local/share'
+            target=data/'icons/Breeze';target.mkdir(parents=True)
+            (home/'.icons').symlink_to(data/'icons')
+            temp=root/'stage';temp.mkdir()
+            journal=a.Journal(root/'state')
+            a.install_cursor_alias(journal,temp,home,data,'Breeze')
+            self.assertEqual(journal.data['items'],[])
+            self.assertFalse(target.is_symlink())

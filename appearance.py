@@ -170,6 +170,17 @@ def copy(source, destination):
         shutil.copy2(source, destination)
 
 
+def install_cursor_alias(journal, temp, home, data, name):
+    """Also expose XDG cursors to clients that still search only ~/.icons."""
+    target = data / 'icons' / name
+    legacy = home / '.icons' / name
+    if target.resolve() == legacy.resolve():
+        return
+    link = temp / 'cursor-compatibility'
+    link.symlink_to(os.path.relpath(target, legacy.parent))
+    journal.install(link, legacy, 'cursor')
+
+
 def validate_resource_links(resources):
     """Reject empty graphics and links that will not survive relocation."""
     roots = [(source.resolve(), target) for source, target, _scope in resources]
@@ -749,6 +760,8 @@ class Appearance:
                     journal.install(source, target, scope)
                 # Check the actual installed graph before selecting any theme.
                 validate_resource_links([(target, target, scope) for _source, target, scope in resources])
+                if 'cursor' in self.selected:
+                    install_cursor_alias(journal, temp, self.home, self.data, self.profile['cursor']['name'])
                 interface = Settings('org.gnome.desktop.interface')
                 for part, key in [('theme', 'gtk-theme'), ('icons', 'icon-theme'), ('cursor', 'cursor-theme')]:
                     if part in self.selected:

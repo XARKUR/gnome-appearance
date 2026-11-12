@@ -114,3 +114,5 @@ python3 -m unittest discover -s tests -v
 测试在临时目录和模拟设置中运行，不应用真实桌面外观。资源来源及 SHA256 见 `resources/manifest.json`；自动下载项目后仍会核对随包资源。
 
 安装器原创代码采用 MIT 许可。Orchis、Tela、GNOME 和 Breeze 各自保留原许可、作者信息及对应源码，详见 [NOTICE.md](NOTICE.md)。Breeze 使用可核验的 KDE 5.27.5 / Debian 发行内容，具体版本、二进制来源和源码归档记录在 `resources/breeze.lock.json`。
+
+指针安装同时维护 `~/.icons/<主题名>` 到 XDG 图标目录的兼容入口，供仍使用旧搜索路径的 Wayland / Xcursor 客户端查找；已有同名资源会备份，恢复指针时一并还原。
