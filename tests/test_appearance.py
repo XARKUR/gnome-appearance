@@ -294,6 +294,10 @@ class AppearanceTests(unittest.TestCase):
                         self.assertIn('background-size: 24px;', (output / 'gnome-shell.css').read_text())
                         self.assertNotIn('background-position: center;', (output / 'gnome-shell.css').read_text())
                         self.assertNotIn('background-size: 24px 24px;', (output / 'gnome-shell.css').read_text())
+                        css = (output / 'gnome-shell.css').read_text()
+                        self.assertIn('#panel:overview .panel-button#panelActivities .workspace-dot', css)
+                        self.assertIn('background-color: transparent;', css.rsplit('.workspace-dot', 1)[-1])
+                        self.assertNotIn('opacity:', css.rsplit('.workspace-dot', 1)[-1])
 
     def test_invalid_resource_path_and_name_are_rejected(self):
         with tempfile.TemporaryDirectory() as d:

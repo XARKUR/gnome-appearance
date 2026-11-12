@@ -63,7 +63,8 @@
 }
 
 @if $activities == 'icon' {
-  #panel .panel-button#panelActivities {
+  #panel .panel-button#panelActivities,
+  #panel:overview .panel-button#panelActivities {
     background-image: url("assets/activities.svg");
     background-repeat: no-repeat;
     background-size: 24px;
@@ -74,8 +75,11 @@
       spacing: 0;
     }
 
+    // Shell sets the actor opacity itself; hide its painted background instead.
     .workspace-dot {
-      opacity: 0;
+      background-color: transparent;
+      border-color: transparent;
+      box-shadow: none;
     }
   }
 }
